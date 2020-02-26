@@ -1,0 +1,46 @@
+{
+  "name": "electron-quick-start",
+  "version": "1.0.0",
+  "description": "Copy cat clipboard",
+  "main": "./main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "repository": "https://github.com/electron/electron-quick-start",
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo"
+  ],
+  "author": "Moin",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^5.0.6",
+    "electron-builder": "^22.3.2",
+    "electron-packager": "^14.2.0"
+  },
+  "build": {
+    "appId": "com.moi2n.testing",
+    "productName": "Manage Clipboard history",
+    "win": {
+      "target": "nsis"
+    },
+    "directories": {
+      "buildResources": "build"
+    },
+    "files": [
+      "./App/Clipboard.js",
+      "./tray1.ico",
+      "./main.js",
+      "./App/renderer.js",
+      "./App/index.html"
+    ],
+    "extraResources": [
+      "./resources/**"
+    ]
+  },
+  "dependencies": {}
+}

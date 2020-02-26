@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    
+    .clipBoardElements {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    
+    
+    .clipBoardElements  .clipBoardElement {
+      background: #27262f;
+      display: block;
+      padding: 5px;
+      cursor: pointer;
+      border-bottom: 1px solid gray;
+      color: gray;
+    }
+    
+
+    .clipBoardElements  .clipBoardElement.active
+    {
+      background: #434150;
+    }
+
+    .clipBoardElements li:last-child .clipBoardElement{
+      border-bottom: none;
+    }
+    
+    .clipBoardElements .clipBoardElement:hover{
+      background: #434150;
+    }
+    
+    .clipBoardElements .clipBoardElement.active:hover{
+      background: #3f3f3f;
+    }
+
+    .ch-count
+    {
+      font-size: 12px;
+      color: gray;
+      
+    }
+    
+  </style>
+</head>
+<body>
+  <ul tabindex="0" class="clipBoardElements"></ul>
+  <script>
+    require("./renderer.js");
+  </script>
+</body>
+</html>
