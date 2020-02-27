@@ -5,6 +5,27 @@ const path = require('path');
 const fs = require('fs');
 const { exec, execFile } = require('child_process');
 
+const AutoLaunch = require('auto-launch')
+
+const ElectronSampleAppLauncher = new AutoLaunch({
+  name: 'Clipboard-history-Copycat'
+});
+
+/* 
+const clipboardWatcher = require('electron-clipboard-watcher');
+
+clipboardWatcher({
+  // (optional) delay in ms between polls
+  watchDelay: 500,
+  
+  // handler for when image data is copied into the clipboard
+  onImageChange: function (nativeImage) { console.log(nativeImage) },
+  
+  // handler for when text data is copied into the clipboard
+  onTextChange: function (text) { console.log(text) }
+}); */
+
+
 let clipy = null;
 
 const Clipboard = require('./App/Clipboard');
@@ -31,13 +52,24 @@ if(!fs.existsSync(pe))
 // });
 
 
+ipcMain.on('remove', function(event, ind){
+    clipy.remove(ind);
+    rendererUpdate();
+});
+
 ipcMain.on("select", function(event, ind){
   win.minimize();
   win.hide();  
   
-  let str = clipy.get(ind).str;
-
-  clipboard.writeText(str);
+  let element = clipy.get(ind);
+  
+  if(element.info.type == 'text'){ 
+    let str = element.str;
+    clipboard.writeText(str);
+  }else{
+    
+    clipboard.writeImage(element.info.image);
+  }
   const child = exec(`"${pe}"`, [], (error, stdout, stderr) => {
     if (error) {
       throw error;
@@ -50,11 +82,15 @@ ipcMain.on("console.log", function(event, msg){
 });
 
 ipcMain.on("resize-window", function(event, data){
-  let h = Math.min(600, Math.max(300, data.h));
+  
+  let h = Math.min(600, Math.max(50, data.h));
+  // console.log(h);
   h = Math.round(h);
+  // console.log(h);
   // console.log("Height set to ", h);
   win.setSize(400, h);
   
+  // console.log('resize end\n');
 });
 
 const logThis = (s)=>{
@@ -102,6 +138,19 @@ function createWindow () {
   // Open the DevTools.
   // win.webContents.openDevTools();
   
+  ElectronSampleAppLauncher.enable();
+  
+  ElectronSampleAppLauncher.isEnabled()
+  .then(function(isEnabled){
+    if(isEnabled){
+      return;
+    }
+    ElectronSampleAppLauncher.enable();
+  })
+  .catch(function(err){
+    // handle error
+  });
+  
   win.once('ready-to-show', () => {
     clipy = new Clipboard(clipboardData, win);
     
@@ -127,10 +176,33 @@ function rendererUpdate()
   for(data in clipBoardData)
   {
     let orig = data;
-    data = data.substr(0, maxLenght)+(orig.length>maxLenght?"...":"");
     let info = clipBoardData[orig];
-    info['length'] = orig.length;
-    dataD.push({data, info});
+    
+    if(info.type == 'text')
+    {
+      data = data.substr(0, maxLenght)+(orig.length>maxLenght?"...":"");
+      info['length'] = orig.length;
+      if(orig.length > 0){
+        dataD.push({data, info});
+      }
+    }else{
+      
+      if(info.size.width > info.size.height){
+        if(info.size.width > 100){
+          let d = info.image.resize({width:100});
+          dataD.push({data:d.toDataURL(), info});
+        }else{
+          dataD.push({data:info.image.toDataURL(), info});
+        }
+      }else{
+        if(info.size.height > 100){
+          let d = info.image.resize({height:100});
+          dataD.push({data:d.toDataURL(), info});
+        }else{
+          dataD.push({data:info.image.toDataURL(), info});
+        }
+      }
+    }
   }
   
   // console.log(dataD);
@@ -156,9 +228,25 @@ app.whenReady().then(()=>{
 function setWindowAndShow(toMouse=true)
 {
   let mousePos = electron.screen.getCursorScreenPoint();
+  const { width:sw, height:sh } = electron.screen.getPrimaryDisplay().workAreaSize;
+  
+  
   rendererUpdate();
   if(toMouse != false){
-    win.setPosition(mousePos.x, mousePos.y, true);
+    const [ww, wh] = win.getSize(); 
+    let mx = mousePos.x;
+    let my = mousePos.y;
+    if(my+wh > sh)
+    {
+      my = sh-wh;
+    }
+    
+    if(mx+ww > sw)
+    {
+      mx = sw-ww;
+    }
+    
+    win.setPosition(mx, my, true);
   }
   win.show();
 }

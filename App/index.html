@@ -8,6 +8,7 @@
     body {
       margin: 0;
       padding: 0;
+      color: gray;
     }
     
     .clipBoardElements {
@@ -17,22 +18,24 @@
     }
     
     
+    .remove{
+      float:right;
+    }
     
-    .clipBoardElements  .clipBoardElement {
+    .clipBoardElements  .clipBoardElement, .none{
       background: #27262f;
       display: block;
       padding: 5px;
       cursor: pointer;
       border-bottom: 1px solid gray;
-      color: gray;
     }
     
-
+    
     .clipBoardElements  .clipBoardElement.active
     {
       background: #434150;
     }
-
+    
     .clipBoardElements li:last-child .clipBoardElement{
       border-bottom: none;
     }
@@ -44,7 +47,7 @@
     .clipBoardElements .clipBoardElement.active:hover{
       background: #3f3f3f;
     }
-
+    
     .ch-count
     {
       font-size: 12px;
@@ -52,10 +55,35 @@
       
     }
     
+    .main
+    {
+      background: #27262f;
+      
+    }
+    form{
+      -webkit-app-region: drag;
+    }    
   </style>
 </head>
 <body>
-  <ul tabindex="0" class="clipBoardElements"></ul>
+  <div class="main">
+    <form style="border-bottom: 1px solid gray;padding:5px;">
+      <label for="all">
+        <input type="radio" checked name="filter" value="all" />
+        All
+      </label>
+      <label for="all">
+        <input type="radio" name="filter" value="text" />
+        Text
+      </label>
+      <label for="all">
+        <input type="radio" name="filter" value="image" />
+        Image
+      </label>
+    </form>
+    <ul tabindex="0" class="clipBoardElements"></ul>
+    <div class="none" id="none">No data</div>
+  </div>
   <script>
     require("./renderer.js");
   </script>
